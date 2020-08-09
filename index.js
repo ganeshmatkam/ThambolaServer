@@ -12,6 +12,7 @@ var msgReadStream = fs.createReadStream("./database/messages.txt");
 
 var adminSocket;
 
+
 io.on('connection', (socket) => {
     socket.on('disconnect', function () {
         io.emit('users-changed', {
@@ -82,3 +83,19 @@ server.on("close", (data)=> {
     usrWriteStream.end();
     msgWriteStream.end();
 })
+
+app.get('/number-picker', function(request, response){
+    response.sendFile('web-pages/Thambola/Counter.html', { root: __dirname });
+});
+
+app.get('/users', function(request, response){
+    console.log(request);
+    response.json({users: [1,2,3,4]});
+});
+
+app.get('/newNumber/:number', function(request, response){
+    var newNumber = request.params.number;
+    console.log('URL number', request.params.number);
+    io.emit('new-picked-number', newNumber);
+    response.json({status: 'success'});
+});
