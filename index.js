@@ -27,6 +27,7 @@ io.on('connection', (socket) => {
             }
             console.log("Added user: ", newUserData);
         });
+        console.log('Sending new ticket to '+socket.username)
         socket.emit('new-thambola-ticket', {
             user: name, 
             event: 'new-thambola-ticket', 
