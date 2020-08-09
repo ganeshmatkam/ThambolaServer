@@ -10,6 +10,8 @@ var usrReadStream = fs.createReadStream("./database/users.txt");
 var msgWriteStream = fs.createWriteStream("./database/messages.txt", {flags:'a'});
 var msgReadStream = fs.createReadStream("./database/messages.txt");
 
+var adminSocket;
+
 io.on('connection', (socket) => {
     socket.on('disconnect', function () {
         io.emit('users-changed', {
@@ -37,6 +39,10 @@ io.on('connection', (socket) => {
             user: name,
             event: 'joined'
         });
+
+        if(name.indexOf('admin1563') !== -1) {
+            adminSocket = socket;
+        }
     });
 
     socket.on('send-message', (message) => {
@@ -49,6 +55,19 @@ io.on('connection', (socket) => {
         const newMsgStr = `${newMsg.user}\t${newMsg.msg}\t${newMsg.createdAt.getTime()}\n`;
         msgWriteStream.write(newMsgStr);
         io.emit('message', newMsg);
+    });
+
+    socket.on('user-ticket-number-click', (ticketData) => {
+        const currentTime = new Date();
+        const adminData = {
+            user: ticketData.username,
+            createdAt: currentTime,
+            ticket: ticketData.ticket,
+            choosenNumbers: ticketData.selectedNumbers
+        } 
+        if(adminSocket) {
+            adminSocket.emit('adminInfo-user-ticket-number-click', adminData);
+        }     
     });
 });
 
